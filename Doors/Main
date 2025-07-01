@@ -1,1 +1,25 @@
+if game.PlaceId == 6516141723 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaLandy/Scripts/refs/heads/main/Doors/Lobby"))()
+elseif game.PlaceId == 6839171747 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaLandy/Scripts/refs/heads/main/Doors/Hotel"))()
+elseif game.PlaceId == 110258689672367 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaLandy/Scripts/refs/heads/main/Doors/HotelMinus"))()
+elseif game.PlaceId == 10549820578 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaLandy/Scripts/refs/heads/main/Doors/SuperHardMode"))()
+else
 
+end
+
+local floorValue = game:GetService("ReplicatedStorage").GameData.Floor.Value
+
+if floorValue == "Mines" then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaLandy/Scripts/refs/heads/main/Doors/Mines"))()
+elseif floorValue == "Backdoor" then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaLandy/Scripts/refs/heads/main/Doors/Backdoor"))()
+elseif floorValue == "Retro" then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaLandy/Scripts/refs/heads/main/Doors/Retro"))()
+elseif floorValue == "Hotel" then
+    warn("yes")
+else
+
+end
