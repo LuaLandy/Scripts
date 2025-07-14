@@ -1,11 +1,10 @@
-local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "NotificationGui"
 gui.ResetOnSpawn = false
-gui.IgnoreGuiInset = false
+gui.IgnoreGuiInset = true
 gui.Parent = CoreGui
 
 local container = Instance.new("Frame")
@@ -24,14 +23,14 @@ local INITIAL_Y_OFFSET = 40
 local function shiftNotifications()
 	for i, notif in ipairs(activeNotifications) do
 		local targetY = -((i - 1) * (NOTIF_HEIGHT + NOTIF_GAP)) - INITIAL_Y_OFFSET
-		local tween = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {
+		local tween = TweenService:Create(notif, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
 			Position = UDim2.new(1, 0, 1, targetY)
 		})
 		tween:Play()
 	end
 end
 
-local function Notification(titleText, descText, duration, soundId)
+return function(titleText, descText, duration, soundId)
 	duration = duration or 5
 
 	local frame = Instance.new("Frame")
@@ -41,7 +40,7 @@ local function Notification(titleText, descText, duration, soundId)
 	frame.BorderSizePixel = 0
 	frame.ClipsDescendants = true
 	frame.AnchorPoint = Vector2.new(1, 1)
-	frame.Position = UDim2.new(1, 310, 1, 0)
+	frame.Position = UDim2.new(1, 320, 1, 0)
 
 	local corner = Instance.new("UICorner", frame)
 	corner.CornerRadius = UDim.new(0, 12)
@@ -130,5 +129,3 @@ local function Notification(titleText, descText, duration, soundId)
 		shiftNotifications()
 	end)
 end
-
-return Notification
