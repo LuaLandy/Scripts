@@ -1,13 +1,12 @@
-local code = [[
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local player = Players.LocalPlayer
+local CoreGui = game:GetService("CoreGui")
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "NotificationGui"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = false
-gui.Parent = player:WaitForChild("PlayerGui")
+gui.Parent = CoreGui
 
 local container = Instance.new("Frame")
 container.Name = "NotificationContainer"
@@ -20,7 +19,7 @@ container.Parent = gui
 local activeNotifications = {}
 local NOTIF_HEIGHT = 90
 local NOTIF_GAP = 10
-local INITIAL_Y_OFFSET = 20
+local INITIAL_Y_OFFSET = 40
 
 local function shiftNotifications()
 	for i, notif in ipairs(activeNotifications) do
@@ -32,7 +31,7 @@ local function shiftNotifications()
 	end
 end
 
-return function(titleText, descText, duration, soundId)
+local function Notification(titleText, descText, duration, soundId)
 	duration = duration or 5
 
 	local frame = Instance.new("Frame")
@@ -131,4 +130,5 @@ return function(titleText, descText, duration, soundId)
 		shiftNotifications()
 	end)
 end
-]]
+
+return Notification
