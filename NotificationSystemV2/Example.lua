@@ -2,4 +2,4 @@ local Notification = loadstring(game:HttpGet("https://raw.githubusercontent.com/
 
 Notification("Title", "Notification without sound", 5)
 wait(1)
-Notification("Title", "Notification with sound.", 5, 4590657391)
+Notification("Title", "Notification with sound", 5, 4590657391)
