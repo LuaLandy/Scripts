@@ -61,7 +61,7 @@ local function Notification(title,description,duration,soundId)
 		local sound=Instance.new("Sound")
 		sound.Parent=notif
 		sound.SoundId="rbxassetid://"..tostring(soundId)
-		sound.Volume=5
+		sound.Volume=1
 		sound:Play()
 	end
 	local tweenIn=TweenService:Create(notif,TweenInfo.new(0.5,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{
