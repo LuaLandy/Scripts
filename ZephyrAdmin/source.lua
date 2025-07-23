@@ -1,5 +1,9 @@
 --credits to Infinite Yield, Nameless Admin for some scripts
 
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
