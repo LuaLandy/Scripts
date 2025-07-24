@@ -66,7 +66,7 @@ local function Notification(title,description,duration,soundId)
 	end
 	local tweenIn=TweenService:Create(notif,TweenInfo.new(0.5,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{
 		Position=UDim2.new(0,0,0,notif.Position.Y.Offset),
-		BackgroundTransparency=0.5
+		BackgroundTransparency=0.3
 	})
 	tweenIn:Play()
 	local shrinkBar=TweenService:Create(bar,TweenInfo.new(duration,Enum.EasingStyle.Linear),{
