@@ -17,6 +17,7 @@ ESPLibrary:Font(Enum.Font.GothamBold)
 ESPLibrary:TextSize(20)
 ESPLibrary:Rainbow(true)
 ESPLibrary:Tracers(true)
+ESPLibrary:DistanceMeters(true)
 
 task.delay(10, function()
     for _,door in pairs(workspace:GetDescendants()) do
