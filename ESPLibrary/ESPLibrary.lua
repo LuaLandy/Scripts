@@ -74,7 +74,7 @@ return (function()
         label.BackgroundTransparency = 1
         label.Text = text
         label.TextColor3 = color
-        label.TextScaled = true
+        label.TextScaled = false
         label.Font = currentFont
         label.TextSize = textSize
         label.Parent = billboard
@@ -88,7 +88,7 @@ return (function()
             distanceLabel.BackgroundTransparency = 1
             distanceLabel.Text = "[ 0 ]"
             distanceLabel.TextColor3 = color
-            distanceLabel.TextScaled = true
+            distanceLabel.TextScaled = false
             distanceLabel.Font = currentFont
             distanceLabel.TextSize = math.max(10, textSize - 2)
             distanceLabel.Parent = billboard
