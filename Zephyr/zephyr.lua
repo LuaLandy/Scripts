@@ -101,7 +101,7 @@ end)
 
 function GuiLibrary:CreateWindow(Args)
     Args = Args or {}
-    local WindowApi = { Expanded = true }
+    local WindowApi = { Expanded = true, layoutIndex = 1 }
     local WindowName = tostring(Args.Name or "Window")
     local layoutIndex = 1
 
@@ -203,10 +203,10 @@ function GuiLibrary:CreateWindow(Args)
         local ModuleContainer = Instance.new("Frame")
         local ModuleListLayout = Instance.new("UIListLayout")
 
-        local myOrder = layoutIndex
+        local myOrder = WindowApi.layoutIndex
         OptionsButton.LayoutOrder = myOrder
         ChildrenContainer.LayoutOrder = myOrder + 1
-        layoutIndex = layoutIndex + 2
+        WindowApi.layoutIndex = WindowApi.layoutIndex + 2
 
         OptionsButton.Name = tostring(ArgsButton.Name or "Option") .. "OptionsButton"
         OptionsButton.Parent = ButtonContainer
