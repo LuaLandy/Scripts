@@ -830,4 +830,5 @@ UserInputService.InputBegan:Connect(function(input, processed)
     end
 end)
 
-return GuiLibrary
+local success, library = pcall(function() return GuiLibrary end)
+return (success and library) or {}
