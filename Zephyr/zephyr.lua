@@ -829,3 +829,5 @@ UserInputService.InputBegan:Connect(function(input, processed)
         ToggleAllFrames()
     end
 end)
+
+return GuiLibrary
