@@ -33,8 +33,8 @@ local function DragGui(Frame, Handle)
     local dragging, dragStart, startPos
     local function Update(input)
         if not input or not input.Position or not startPos or not Frame then return end
-        local success, delta = pcall(function() return input.Position - dragStart end)
-        if not success or not delta then return end
+        local ok, delta = pcall(function() return input.Position - dragStart end)
+        if not ok or not delta then return end
         Frame.Position = UDim2.new(
             startPos.X.Scale,
             startPos.X.Offset + delta.X,
@@ -70,16 +70,16 @@ local GuiLibrary = {
     Connections = {}
 }
 
-local function safeConnect(eventLike, callback)
-    if not eventLike or type(eventLike.Connect) ~= "function" then return end
-    local ok, conn = pcall(function()
-        return eventLike:Connect(function(...)
-            pcall(callback, ...)
+local function SafeConnect(EventLike, Callback)
+    if not EventLike or type(EventLike.Connect) ~= "function" then return end
+    local ok, Conn = pcall(function()
+        return EventLike:Connect(function(...)
+            pcall(Callback, ...)
         end)
     end)
-    if ok and conn then
-        table.insert(GuiLibrary.Connections, conn)
-        return conn
+    if ok and Conn then
+        table.insert(GuiLibrary.Connections, Conn)
+        return Conn
     end
     return nil
 end
@@ -89,7 +89,7 @@ ClickGui.Name = "Zephyr"
 ClickGui.ResetOnSpawn = false
 ClickGui.Parent = CoreGui
 
-safeConnect(ClickGui.AncestryChanged, function()
+SafeConnect(ClickGui.AncestryChanged, function()
     if not ClickGui:IsDescendantOf(game) then
         for _, conn in ipairs(GuiLibrary.Connections) do
             pcall(function() if conn and conn.Disconnect then conn:Disconnect() end end)
@@ -100,9 +100,8 @@ end)
 
 function GuiLibrary:CreateWindow(Args)
     Args = Args or {}
-    local WindowApi = { Expanded = true, layoutIndex = 1 }
+    local WindowApi = { Expanded = true, LayoutCounter = 1 }
     local WindowName = tostring(Args.Name or "Window")
-    local layoutIndex = 1
 
     local Window = Instance.new("Frame")
     local WindowTopbar = Instance.new("TextButton")
@@ -202,10 +201,10 @@ function GuiLibrary:CreateWindow(Args)
         local ModuleContainer = Instance.new("Frame")
         local ModuleListLayout = Instance.new("UIListLayout")
 
-        local myOrder = WindowApi.layoutIndex
+        local myOrder = WindowApi.LayoutCounter
         OptionsButton.LayoutOrder = myOrder
         ChildrenContainer.LayoutOrder = myOrder + 1
-        WindowApi.layoutIndex = WindowApi.layoutIndex + 2
+        WindowApi.LayoutCounter = WindowApi.LayoutCounter + 2
 
         OptionsButton.Name = tostring(ArgsButton.Name or "Option") .. "OptionsButton"
         OptionsButton.Parent = ButtonContainer
@@ -335,8 +334,8 @@ function GuiLibrary:CreateWindow(Args)
             WindowApi:Update()
         end
 
-        safeConnect(ModuleListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function() pcall(function() ButtonApi:Update() end) end)
-        safeConnect(ChildrenListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function() pcall(function() ButtonApi:Update() end) end)
+        SafeConnect(ModuleListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function() pcall(function() ButtonApi:Update() end) end)
+        SafeConnect(ChildrenListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function() pcall(function() ButtonApi:Update() end) end)
 
         function ButtonApi:Expand(Boolean)
             local DoExpand = (Boolean ~= nil) and Boolean or not ButtonApi.Expanded
@@ -380,7 +379,7 @@ function GuiLibrary:CreateWindow(Args)
 
         if not ArgsButton.NoKeybind and KeybindButton and KeybindName then
             local ExclusionsList = { "Unknown" }
-            safeConnect(UserInputService.InputBegan, function(Input, GameProcessed)
+            SafeConnect(UserInputService.InputBegan, function(Input, GameProcessed)
                 if GameProcessed then return end
                 if ButtonApi.IsRecording and Input and Input.KeyCode and not table.find(ExclusionsList, tostring(Input.KeyCode.Name)) and UserInputService:GetFocusedTextBox() == nil then
                     ButtonApi.IsRecording = false
@@ -687,7 +686,7 @@ function GuiLibrary:CreateWindow(Args)
                 end
             end)
 
-            safeConnect(UserInputService.InputChanged, function(Input)
+            SafeConnect(UserInputService.InputChanged, function(Input)
                 if not Input then return end
                 if (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) and Sliding then
                     Slide(Input)
@@ -784,7 +783,7 @@ function GuiLibrary:CreateWindow(Args)
     WindowTopbar.MouseButton2Click:Connect(function() pcall(function() WindowApi:Expand() end) end)
     DragGui(Window, WindowTopbar)
 
-    safeConnect(ButtonListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function() pcall(function() WindowApi:Update() end) end)
+    SafeConnect(ButtonListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function() pcall(function() WindowApi:Update() end) end)
 
     GuiLibrary.Objects[WindowName .. "Window"] = { API = WindowApi, Instance = Window, Type = "Window" }
 
@@ -798,21 +797,13 @@ function GuiLibrary:UpdateWindows()
     end
 end
 
-if getgenv then
-    getgenv().GuiLibraryExample = GuiLibrary
-else
-    _G.GuiLibraryExample = GuiLibrary
-end
-
 local ClickGuiRef = CoreGui:WaitForChild("Zephyr")
 
 local AllVisible = true
 local function ToggleAllFrames()
     AllVisible = not AllVisible
     for _, obj in pairs(ClickGuiRef:GetChildren()) do
-        if obj:IsA("Frame") then
-            pcall(function() obj.Visible = AllVisible end)
-        end
+        if obj:IsA("Frame") then obj.Visible = AllVisible end
     end
 end
 
@@ -829,14 +820,12 @@ ToggleButton.TextSize = GuiLibrary.TextSize
 ToggleButton.TextColor3 = Color3.fromRGB(230, 230, 230)
 ToggleButton.ZIndex = 5
 
-safeConnect(ToggleButton.Activated, function() ToggleAllFrames() end)
+ToggleButton.Activated:Connect(ToggleAllFrames)
 
 DragGui(ToggleButton, ToggleButton)
 
-safeConnect(UserInputService.InputBegan, function(input, processed)
-    if not processed and input and input.KeyCode == Enum.KeyCode.RightShift and not UserInputService:GetFocusedTextBox() then
+UserInputService.InputBegan:Connect(function(input, processed)
+    if not processed and input.KeyCode == Enum.KeyCode.RightShift and not UserInputService:GetFocusedTextBox() then
         ToggleAllFrames()
     end
 end)
-
-return GuiLibrary
