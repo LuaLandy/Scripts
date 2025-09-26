@@ -1,4 +1,3 @@
-return (function()
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -841,4 +840,3 @@ safeConnect(UserInputService.InputBegan, function(input, processed)
 end)
 
 return GuiLibrary
-end)()
