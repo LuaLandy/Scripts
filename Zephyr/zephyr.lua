@@ -245,7 +245,9 @@ function GuiLibrary:CreateWindow(Args)
         GearButton.TextColor3 = Color3.fromRGB(180,180,180)
         GearButton.AutoButtonColor = false
 
-        ChildrenContainer.Name = tostring(ArgsButton.Name or "Option") .. "__ZZZZZ__ChildrenContainer"
+        local ButtonId = OptionsButton.Name .. "_" .. tostring(math.random(1,1000000000))
+
+        ChildrenContainer.Name = ButtonId .. "__ChildrenContainer"
         ChildrenContainer.Parent = ButtonContainer
         ChildrenContainer.AnchorPoint = Vector2.new(0, 0)
         ChildrenContainer.BackgroundTransparency = 1
@@ -259,7 +261,7 @@ function GuiLibrary:CreateWindow(Args)
         ChildrenListLayout.SortOrder = Enum.SortOrder.LayoutOrder
         ChildrenListLayout.Padding = UDim.new(0, 1)
 
-        ModuleContainer.Name = "ModuleContainer"
+        ModuleContainer.Name = ButtonId .. "__ModuleContainer"
         ModuleContainer.Parent = ChildrenContainer
         ModuleContainer.AnchorPoint = Vector2.new(0, 0)
         ModuleContainer.BackgroundTransparency = 1
@@ -461,7 +463,7 @@ function GuiLibrary:CreateWindow(Args)
             if (ArgsToggle.Default ~= nil) then ToggleApi:Toggle(ArgsToggle.Default) end
             ToggleBtn.MouseButton1Click:Connect(function() pcall(function() ToggleApi:Toggle() end) end)
 
-            GuiLibrary.Objects[OptionsButton.Name .. tostring(ArgsToggle.Name or "Toggle") .. "Toggle"] = {
+            GuiLibrary.Objects[ButtonId .. tostring(ArgsToggle.Name or "Toggle") .. "Toggle"] = {
                 API = ToggleApi, Instance = ToggleBtn, Type = "Toggle", OptionsButton = OptionsButton.Name, Window = Window.Name
             }
 
@@ -554,7 +556,7 @@ function GuiLibrary:CreateWindow(Args)
             SelectorBtn.MouseButton1Click:Connect(function() pcall(function() SelectorApi:SelectNext() end) end)
             SelectorBtn.MouseButton2Click:Connect(function() pcall(function() SelectorApi:SelectPrevious() end) end)
 
-            GuiLibrary.Objects[OptionsButton.Name .. tostring(ArgsSelector.Name or "Selector") .. "Selector"] = {
+            GuiLibrary.Objects[ButtonId .. tostring(ArgsSelector.Name or "Selector") .. "Selector"] = {
                 API = SelectorApi, Instance = SelectorBtn, Type = "Selector", OptionsButton = OptionsButton.Name, Window = Window.Name
             }
 
@@ -704,7 +706,7 @@ function GuiLibrary:CreateWindow(Args)
 
             SliderApi:Set(SliderApi.Value)
 
-            GuiLibrary.Objects[OptionsButton.Name .. tostring(ArgsSlider.Name or "Slider") .. "Slider"] = {
+            GuiLibrary.Objects[ButtonId .. tostring(ArgsSlider.Name or "Slider") .. "Slider"] = {
                 API = SliderApi, Instance = SliderBtn, Type = "Slider", OptionsButton = OptionsButton.Name, Window = Window.Name
             }
 
@@ -756,14 +758,14 @@ function GuiLibrary:CreateWindow(Args)
                 pcall(function() TextboxApi:Set(RealTextbox.Text) end)
             end)
 
-            GuiLibrary.Objects[OptionsButton.Name .. tostring(ArgsTextbox.Name or "Textbox") .. "Textbox"] = {
+            GuiLibrary.Objects[ButtonId .. tostring(ArgsTextbox.Name or "Textbox") .. "Textbox"] = {
                 API = TextboxApi, Instance = TextboxBtn, Type = "Textbox", OptionsButton = OptionsButton.Name, Window = Window.Name
             }
 
             return TextboxApi
         end
 
-        GuiLibrary.Objects[tostring(ArgsButton.Name or "Option") .. "OptionsButton"] = {
+        GuiLibrary.Objects[ButtonId .. "OptionsButton"] = {
             Name = ArgsButton.Name, API = ButtonApi, Instance = OptionsButton, Type = "OptionsButton", Window = Window.Name
         }
 
