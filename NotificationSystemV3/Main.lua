@@ -38,7 +38,7 @@ local function Reposition(Duration)
 	end
 end
 
-local function CreateNotif(Message, Duration, SoundId)
+local function CreateNotif(Message, Duration, SoundId, Rainbow, BarColor)
 	Duration = Duration or 3
 	local ScreenW = GetScreenWidth()
 	local TextWidth = GetTextWidth(Message, Enum.Font.SourceSansBold, 18)
@@ -67,8 +67,20 @@ local function CreateNotif(Message, Duration, SoundId)
 	local Bar = Instance.new("Frame", Frame)
 	Bar.Size = UDim2.new(1, 0, 0, 3)
 	Bar.Position = UDim2.new(0, 0, 1, -3)
-	Bar.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
 	Bar.BorderSizePixel = 0
+
+	if Rainbow then
+		local startTime = tick()
+		task.spawn(function()
+			while Bar and Bar.Parent do
+				local hue = ((tick() - startTime) * 0.1) % 1
+				Bar.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+				task.wait(0.05)
+			end
+		end)
+	else
+		Bar.BackgroundColor3 = BarColor or Color3.fromRGB(0, 128, 255)
+	end
 
 	if SoundId then
 		local Sound = Instance.new("Sound", Frame)
@@ -100,8 +112,8 @@ local function CreateNotif(Message, Duration, SoundId)
 	Reposition(0.18)
 end
 
-local function Notification(Message, Duration, SoundId)
-	task.spawn(CreateNotif, tostring(Message), Duration or 5, SoundId)
+local function Notification(Message, Duration, SoundId, Rainbow, BarColor)
+	task.spawn(CreateNotif, tostring(Message), Duration or 5, SoundId, Rainbow, BarColor)
 end
 
 return {
