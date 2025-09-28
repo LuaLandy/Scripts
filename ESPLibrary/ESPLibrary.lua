@@ -13,6 +13,7 @@ return (function()
     local textSize = 16
     local currentFont = Enum.Font.FredokaOne
     local distanceEnabled = false
+    local textScaled = false
 
     local function RemoveESPInternal(obj)
         if not obj then return end
@@ -74,7 +75,7 @@ return (function()
         label.BackgroundTransparency = 1
         label.Text = text
         label.TextColor3 = color
-        label.TextScaled = false
+        label.TextScaled = textScaled
         label.Font = currentFont
         label.TextSize = textSize
         label.Parent = billboard
@@ -88,7 +89,7 @@ return (function()
             distanceLabel.BackgroundTransparency = 1
             distanceLabel.Text = "[ 0 ]"
             distanceLabel.TextColor3 = color
-            distanceLabel.TextScaled = false
+            distanceLabel.TextScaled = textScaled
             distanceLabel.Font = currentFont
             distanceLabel.TextSize = math.max(10, textSize - 2)
             distanceLabel.Parent = billboard
@@ -149,6 +150,14 @@ return (function()
         end
     end
 
+    function ESPLibrary:TextScaled(enabled)
+        textScaled = enabled and true or false
+        for _,data in pairs(ESPObjects) do
+            if data.Label then data.Label.TextScaled = textScaled end
+            if data.DistanceLabel then data.DistanceLabel.TextScaled = textScaled end
+        end
+    end
+
     function ESPLibrary:Rainbow(enabled)
         rainbowEnabled = enabled
         if rainbowConnection then rainbowConnection:Disconnect() rainbowConnection = nil end
@@ -195,7 +204,7 @@ return (function()
                     distanceLabel.BackgroundTransparency = 1
                     distanceLabel.Text = "[ 0 ]"
                     distanceLabel.TextColor3 = (data.Highlight and data.Highlight.FillColor) or Color3.new(1,1,1)
-                    distanceLabel.TextScaled = true
+                    distanceLabel.TextScaled = textScaled
                     distanceLabel.Font = currentFont
                     distanceLabel.TextSize = math.max(10, textSize - 2)
                     distanceLabel.Parent = data.Billboard
