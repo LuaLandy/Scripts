@@ -15,6 +15,7 @@ end
 
 ESPLibrary:Font(Enum.Font.GothamBold)
 ESPLibrary:TextSize(20)
+ESPLibrary:TextScaled(false)
 ESPLibrary:Rainbow(true)
 ESPLibrary:Tracers(true)
 ESPLibrary:DistanceMeters(true)
