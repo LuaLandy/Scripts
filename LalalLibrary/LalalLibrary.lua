@@ -309,14 +309,36 @@ function UILib:CreateWindow(Title, Options)
             })
             Create("UICorner", {Parent = DropdownFrame})
 
+            local DropdownScroll = Create("ScrollingFrame", {
+                Parent = DropdownFrame,
+                Active = true,
+                BorderSizePixel = 0,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 1, 0),
+                Position = UDim2.new(0, 0, 0, 0),
+                CanvasSize = UDim2.new(0, 0, 0, 0),
+                ScrollBarThickness = 8,
+                ZIndex = 50
+            })
+
+            local DropdownListLayout = Create("UIListLayout", {Parent = DropdownScroll, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 4)})
+            DropdownListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                DropdownScroll.CanvasSize = UDim2.new(0, 0, 0, DropdownListLayout.AbsoluteContentSize.Y + 8)
+                if Expanded then UpdateDropdownPlacement() end
+            end)
+
             Choices = Choices or {}
             local Buttons = {}
             local Expanded = false
+            local MaxVisibleItems = 8
+            local ItemHeight = 34
             local function UpdateDropdownPlacement()
                 local absPos = DropdownButton.AbsolutePosition
                 local absSize = DropdownButton.AbsoluteSize
                 DropdownFrame.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y)
-                DropdownFrame.Size = UDim2.new(0, absSize.X, 0, Expanded and (#Choices * 34 + 8) or 0)
+                local totalHeight = (#Choices * ItemHeight) + 8
+                local visibleHeight = math.min(totalHeight, MaxVisibleItems * ItemHeight + 8)
+                DropdownFrame.Size = UDim2.new(0, absSize.X, 0, Expanded and visibleHeight or 0)
             end
 
             local function SetExpanded(E)
@@ -340,12 +362,11 @@ function UILib:CreateWindow(Title, Options)
 
             for I, Choice in ipairs(Choices) do
                 local ChoiceButton = Create("TextButton", {
-                    Parent = DropdownFrame,
+                    Parent = DropdownScroll,
                     BorderSizePixel = 0,
                     BackgroundColor3 = Colors.Background,
                     TextColor3 = Colors.Text,
                     Size = UDim2.new(1, -8, 0, 30),
-                    Position = UDim2.new(0, 4, 0, (I-1) * 34 + 4),
                     Text = Choice,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     AutoButtonColor = true,
@@ -367,15 +388,13 @@ function UILib:CreateWindow(Title, Options)
             function Dropdown:Add(NewChoice)
                 if not NewChoice then return end
                 table.insert(Choices, NewChoice)
-                local I = #Buttons + 1
                 local ChoiceText = NewChoice
                 local ChoiceButton = Create("TextButton", {
-                    Parent = DropdownFrame,
+                    Parent = DropdownScroll,
                     BorderSizePixel = 0,
                     BackgroundColor3 = Colors.Background,
                     TextColor3 = Colors.Text,
                     Size = UDim2.new(1, -8, 0, 30),
-                    Position = UDim2.new(0, 4, 0, (I-1) * 34 + 4),
                     Text = ChoiceText,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     AutoButtonColor = true,
@@ -408,9 +427,6 @@ function UILib:CreateWindow(Title, Options)
                 end
                 table.remove(Buttons, idx)
                 table.remove(Choices, idx)
-                for i, btn in ipairs(Buttons) do
-                    btn.Position = UDim2.new(0, 4, 0, (i-1) * 34 + 4)
-                end
                 if DropdownButton.Text == ChoiceName then
                     DropdownButton.Text = "Select"
                 end
