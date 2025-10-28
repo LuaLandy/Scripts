@@ -1,0 +1,1771 @@
+local repo = "https://raw.githubusercontent.com/mstudio45/LinoriaLib/main/"
+
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local Options = Library.Options
+local Toggles = Library.Toggles
+
+Library.ShowToggleFrameInKeybinds = true
+Library.ShowCustomCursor = true
+Library.NotifySide = "Left"
+
+local Window = Library:CreateWindow({
+	Title = "ProjectHax - Fundamental Paper Education",
+	Center = true,
+	AutoShow = true,
+	Resizable = true,
+	ShowCustomCursor = true,
+	NotifySide = "Left",
+	TabPadding = 8,
+	MenuFadeTime = 0.2,
+})
+
+local Tabs = {
+	Main = Window:AddTab("Main"),
+	Destruction = Window:AddTab("Destruction"),
+	Account = Window:AddTab("Account"),
+	Tools = Window:AddTab("Tools"),
+	Admin = Window:AddTab("Admin"),
+	["UI Settings"] = Window:AddTab("UI Settings"),
+}
+
+local Main = Tabs.Main:AddLeftGroupbox("Main")
+
+Main:AddButton({
+    Text = "Kill Tool",
+    Func = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local UIS = game:GetService("UserInputService")
+
+local Tool = Instance.new("Tool")
+Tool.Name = "Kill"
+Tool.RequiresHandle = false
+Tool.CanBeDropped = false
+Tool.Parent = LocalPlayer.Backpack
+
+local function killPlayerByTorso(target)
+	if target and target:IsA("BasePart") then
+		local character = target:FindFirstAncestorOfClass("Model")
+		local plr = Players:GetPlayerFromCharacter(character)
+		if plr and plr ~= LocalPlayer and character then
+			local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso") or character:FindFirstChild("LowerTorso")
+			if torso then
+				CoreReplication:FireServer("Tools", "Remove", torso)
+			end
+		end
+	end
+end
+
+Tool.Activated:Connect(function()
+	local target = Mouse.Target
+	killPlayerByTorso(target)
+end)
+
+Tool.Equipped:Connect(function()
+	UIS.TouchTap:Connect(function(pos, _)
+		local camera = workspace.CurrentCamera
+		local unitRay = camera:ScreenPointToRay(pos.X, pos.Y)
+		local result = workspace:Raycast(unitRay.Origin, unitRay.Direction * 1000)
+		if result then
+			killPlayerByTorso(result.Instance)
+		end
+	end)
+end)
+    end
+})
+
+Main:AddButton({
+    Text = "Ban Tool",
+    Func = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local UIS = game:GetService("UserInputService")
+
+local BannedPlayers = {}
+
+local Tool = Instance.new("Tool")
+Tool.Name = "Ban"
+Tool.RequiresHandle = false
+Tool.CanBeDropped = false
+Tool.Parent = LocalPlayer.Backpack
+
+local function BanPlayer(target)
+    if target and target:IsA("BasePart") then
+        local character = target:FindFirstAncestorOfClass("Model")
+        if character then
+            local plr = Players:GetPlayerFromCharacter(character)
+            if plr and plr ~= LocalPlayer then
+                BannedPlayers[plr.Name] = true
+                CoreReplication:FireServer("Tools", "Remove", plr)
+            end
+        end
+    end
+end
+
+Tool.Activated:Connect(function()
+    local target = Mouse.Target
+    BanPlayer(target)
+end)
+
+Tool.Equipped:Connect(function()
+    UIS.TouchTap:Connect(function(pos, _)
+        local camera = workspace.CurrentCamera
+        local unitRay = camera:ScreenPointToRay(pos.X, pos.Y)
+        local result = workspace:Raycast(unitRay.Origin, unitRay.Direction * 1000)
+        if result then
+            BanPlayer(result.Instance)
+        end
+    end)
+end)
+
+Players.PlayerAdded:Connect(function(plr)
+    if BannedPlayers[plr.Name] then
+        CoreReplication:FireServer("Tools", "Remove", plr)
+    end
+end)
+    end
+})
+
+Main:AddButton({
+    Text = "Kick Tool",
+    Func = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local UIS = game:GetService("UserInputService")
+
+local Tool = Instance.new("Tool")
+Tool.Name = "Kick"
+Tool.RequiresHandle = false
+Tool.CanBeDropped = false
+Tool.Parent = LocalPlayer.Backpack
+
+local function KickPlayer(target)
+    if target and target:IsA("BasePart") then
+        local character = target:FindFirstAncestorOfClass("Model")
+        if character then
+            local plr = Players:GetPlayerFromCharacter(character)
+            if plr and plr ~= Players.LocalPlayer then
+                CoreReplication:FireServer("Tools", "Remove", plr)
+            end
+        end
+    end
+end
+
+Tool.Activated:Connect(function()
+    local target = Mouse.Target
+    KickPlayer(target)
+end)
+
+Tool.Equipped:Connect(function()
+    UIS.TouchTap:Connect(function(pos, _)
+        local camera = workspace.CurrentCamera
+        local unitRay = camera:ScreenPointToRay(pos.X, pos.Y)
+        local result = workspace:Raycast(unitRay.Origin, unitRay.Direction * 1000)
+        if result then
+            KickPlayer(result.Instance)
+        end
+    end)
+end)
+    end
+})
+
+Main:AddButton({
+    Text = "Match Tool",
+    Func = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local UIS = game:GetService("UserInputService")
+
+local Tool = Instance.new("Tool")
+Tool.Name = "Match"
+Tool.RequiresHandle = false
+Tool.CanBeDropped = false
+Tool.Parent = LocalPlayer.Backpack
+
+local function ignitePlayer(target)
+	if target and target:IsA("BasePart") then
+		local character = target:FindFirstAncestorOfClass("Model")
+		local targetPlayer = Players:GetPlayerFromCharacter(character)
+		if targetPlayer and targetPlayer ~= LocalPlayer then
+			local fireParts = {
+				workspace.Map.Outside.Houses.House_1.Inside.Reactors.Fireplace.Fire.Flame,
+				workspace.Map.Outside.Houses.House_1.Inside.Reactors.Fireplace.Fire.Ambience,
+				workspace.Map.Outside.Houses.House_1.Inside.Reactors.Fireplace.Fire.PointLight
+			}
+			for _, obj in ipairs(fireParts) do
+				CoreReplication:FireServer("Tools", "Add", obj, target)
+			end
+		end
+	end
+end
+
+Tool.Activated:Connect(function()
+	local target = Mouse.Target
+	ignitePlayer(target)
+end)
+
+Tool.Equipped:Connect(function()
+	UIS.TouchTap:Connect(function(pos, _)
+		local camera = workspace.CurrentCamera
+		local unitRay = camera:ScreenPointToRay(pos.X, pos.Y)
+		local result = workspace:Raycast(unitRay.Origin, unitRay.Direction * 1000)
+		if result then
+			ignitePlayer(result.Instance)
+		end
+	end)
+end)
+    end
+})
+
+Main:AddButton({
+    Text = "Destroy Tool",
+    Func = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local UIS = game:GetService("UserInputService")
+
+local Tool = Instance.new("Tool")
+Tool.Name = "Destroy"
+Tool.RequiresHandle = false
+Tool.CanBeDropped = false
+Tool.Parent = LocalPlayer.Backpack
+
+local function destroyTarget(target)
+	if target and target:IsA("BasePart") then
+		local modelAncestor = target:FindFirstAncestorOfClass("Model")
+		local owner = Players:GetPlayerFromCharacter(modelAncestor)
+		if not owner then
+			local args = {
+				"Tools",
+				"Remove",
+				target
+			}
+			CoreReplication:FireServer(unpack(args))
+		end
+	end
+end
+
+Tool.Activated:Connect(function()
+	local target = Mouse.Target
+	destroyTarget(target)
+end)
+
+Tool.Equipped:Connect(function()
+	UIS.TouchTap:Connect(function(pos, _)
+		local camera = workspace.CurrentCamera
+		local unitRay = camera:ScreenPointToRay(pos.X, pos.Y)
+		local result = workspace:Raycast(unitRay.Origin, unitRay.Direction * 1000)
+		if result then
+			destroyTarget(result.Instance)
+		end
+	end)
+end)
+    end
+})
+
+Main:AddButton({
+    Text = "Fix Match Tool",
+    Func = function()
+local args = {
+	"Toggle_Fireplace",
+	workspace:WaitForChild("Map"):WaitForChild("Outside"):WaitForChild("Houses"):WaitForChild("House_1"):WaitForChild("Inside"):WaitForChild("Reactors"):WaitForChild("Fireplace"):WaitForChild("Trigger"),
+	workspace:WaitForChild("Map"):WaitForChild("Outside"):WaitForChild("Houses"):WaitForChild("House_1"):WaitForChild("Inside"):WaitForChild("Reactors"):WaitForChild("Fireplace"):WaitForChild("Fire"),
+	0.5
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+    end
+})
+
+Main:AddToggle("NameAllLalal", {
+	Text = "Name All (Lalal)",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+			getgenv().serverDestroyerConnection = game:GetService("RunService").Heartbeat:Connect(function()
+				local Players = game:GetService("Players")
+				local ReplicatedStorage = game:GetService("ReplicatedStorage")
+				local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+				local LocalPlayer = Players.LocalPlayer
+
+				local RPName = "HACKED BY LALAL"
+				local Bio = "go fuck yourself"
+				local Role = "kys niggers"
+
+				for _, player in ipairs(Players:GetPlayers()) do
+					if player ~= LocalPlayer then
+						local character = player.Character
+						if character then
+							local head = character:FindFirstChild("Head")
+							if head then
+								local nametag = head:FindFirstChild("Nametag")
+								if nametag then
+									local rpNameObj = nametag:FindFirstChild("Roleplay_Name")
+									local bioObj = nametag:FindFirstChild("Biography")
+									local roleObj = nametag:FindFirstChild("Role")
+
+									if rpNameObj and rpNameObj:IsA("TextLabel") and rpNameObj.Text ~= RPName then
+										CoreReplication:FireServer("Text", "Set", rpNameObj, RPName, "Roleplay_Name")
+									end
+									if bioObj and bioObj:IsA("TextLabel") and bioObj.Text ~= Bio then
+										CoreReplication:FireServer("Text", "Set", bioObj, Bio, "Biography")
+									end
+									if roleObj and roleObj:IsA("TextLabel") and roleObj.Text ~= Role then
+										CoreReplication:FireServer("Text", "Set", roleObj, Role, "Role")
+									end
+								end
+							end
+						end
+					end
+				end
+			end)
+		else
+			if getgenv().serverDestroyerConnection then
+				getgenv().serverDestroyerConnection:Disconnect()
+				getgenv().serverDestroyerConnection = nil
+			end
+		end
+	end
+})
+
+Main:AddToggle("NameAllLalalReturns", {
+	Text = "Name All (Lalal Returns)",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+			getgenv().serverDestroyerConnection = game:GetService("RunService").Heartbeat:Connect(function()
+				local Players = game:GetService("Players")
+				local ReplicatedStorage = game:GetService("ReplicatedStorage")
+				local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+				local LocalPlayer = Players.LocalPlayer
+
+				local RPName = "HACKED BY LALAL"
+				local Bio = "LALAL RETURNS"
+				local Role = "GET REKT NIGGERS"
+
+				for _, player in ipairs(Players:GetPlayers()) do
+					if player ~= LocalPlayer then
+						local character = player.Character
+						if character then
+							local head = character:FindFirstChild("Head")
+							if head then
+								local nametag = head:FindFirstChild("Nametag")
+								if nametag then
+									local rpNameObj = nametag:FindFirstChild("Roleplay_Name")
+									local bioObj = nametag:FindFirstChild("Biography")
+									local roleObj = nametag:FindFirstChild("Role")
+
+									if rpNameObj and rpNameObj:IsA("TextLabel") and rpNameObj.Text ~= RPName then
+										CoreReplication:FireServer("Text", "Set", rpNameObj, RPName, "Roleplay_Name")
+									end
+									if bioObj and bioObj:IsA("TextLabel") and bioObj.Text ~= Bio then
+										CoreReplication:FireServer("Text", "Set", bioObj, Bio, "Biography")
+									end
+									if roleObj and roleObj:IsA("TextLabel") and roleObj.Text ~= Role then
+										CoreReplication:FireServer("Text", "Set", roleObj, Role, "Role")
+									end
+								end
+							end
+						end
+					end
+				end
+			end)
+		else
+			if getgenv().serverDestroyerConnection then
+				getgenv().serverDestroyerConnection:Disconnect()
+				getgenv().serverDestroyerConnection = nil
+			end
+		end
+	end
+})
+
+Main:AddToggle("NameAllTubers93", {
+	Text = "Name All (Tubers93)",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+			if getgenv().serverDestroyerConnection_NameAllTubers93 then return end
+
+			local Players = game:GetService("Players")
+			local ReplicatedStorage = game:GetService("ReplicatedStorage")
+			local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+			local RunService = game:GetService("RunService")
+			local LocalPlayer = Players.LocalPlayer
+
+			local RPName = "Tubers93 was here..."
+			local Bio = "Welcome to the realm of Tubers93"
+			local Role = "you thought you could escape? ya'allah!"
+
+			getgenv().serverDestroyerConnection_NameAllTubers93 = RunService.Heartbeat:Connect(function()
+				for _, player in ipairs(Players:GetPlayers()) do
+					if player ~= LocalPlayer then
+						local character = player.Character
+						if character then
+							local head = character:FindFirstChild("Head")
+							if head then
+								local nametag = head:FindFirstChild("Nametag")
+								if nametag then
+									local rpNameObj = nametag:FindFirstChild("Roleplay_Name")
+									local bioObj = nametag:FindFirstChild("Biography")
+									local roleObj = nametag:FindFirstChild("Role")
+
+									if rpNameObj and rpNameObj:IsA("TextLabel") and rpNameObj.Text ~= RPName then
+										CoreReplication:FireServer("Text", "Set", rpNameObj, RPName, "Roleplay_Name")
+									end
+									if bioObj and bioObj:IsA("TextLabel") and bioObj.Text ~= Bio then
+										CoreReplication:FireServer("Text", "Set", bioObj, Bio, "Biography")
+									end
+									if roleObj and roleObj:IsA("TextLabel") and roleObj.Text ~= Role then
+										CoreReplication:FireServer("Text", "Set", roleObj, Role, "Role")
+									end
+								end
+							end
+						end
+					end
+				end
+			end)
+		else
+			if getgenv().serverDestroyerConnection_NameAllTubers93 then
+				getgenv().serverDestroyerConnection_NameAllTubers93:Disconnect()
+				getgenv().serverDestroyerConnection_NameAllTubers93 = nil
+			end
+		end
+	end
+})
+
+Main:AddToggle("NameAllTeam", {
+	Text = "Name All (Team)",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+			if getgenv().serverDestroyerConnection_NameAllTubers93 then return end
+
+			local Players = game:GetService("Players")
+			local ReplicatedStorage = game:GetService("ReplicatedStorage")
+			local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+			local RunService = game:GetService("RunService")
+			local LocalPlayer = Players.LocalPlayer
+
+			local RPName = "HACKED BY Overseer, Distortion, Corruption, Jim, Shattered"
+			local Bio = "get rekt niggers"
+			local Role = "the owner is a faggot pedophile"
+
+			getgenv().serverDestroyerConnection_NameAllTubers93 = RunService.Heartbeat:Connect(function()
+				for _, player in ipairs(Players:GetPlayers()) do
+					if player ~= LocalPlayer then
+						local character = player.Character
+						if character then
+							local head = character:FindFirstChild("Head")
+							if head then
+								local nametag = head:FindFirstChild("Nametag")
+								if nametag then
+									local rpNameObj = nametag:FindFirstChild("Roleplay_Name")
+									local bioObj = nametag:FindFirstChild("Biography")
+									local roleObj = nametag:FindFirstChild("Role")
+
+									if rpNameObj and rpNameObj:IsA("TextLabel") and rpNameObj.Text ~= RPName then
+										CoreReplication:FireServer("Text", "Set", rpNameObj, RPName, "Roleplay_Name")
+									end
+									if bioObj and bioObj:IsA("TextLabel") and bioObj.Text ~= Bio then
+										CoreReplication:FireServer("Text", "Set", bioObj, Bio, "Biography")
+									end
+									if roleObj and roleObj:IsA("TextLabel") and roleObj.Text ~= Role then
+										CoreReplication:FireServer("Text", "Set", roleObj, Role, "Role")
+									end
+								end
+							end
+						end
+					end
+				end
+			end)
+		else
+			if getgenv().serverDestroyerConnection_NameAllTubers93 then
+				getgenv().serverDestroyerConnection_NameAllTubers93:Disconnect()
+				getgenv().serverDestroyerConnection_NameAllTubers93 = nil
+			end
+		end
+	end
+})
+
+local Players = Tabs.Main:AddRightGroupbox("Players")
+
+Players:AddButton({
+    Text = "Kick All",
+    Func = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local LocalPlayer = Players.LocalPlayer
+
+for _, player in ipairs(Players:GetPlayers()) do
+	if player ~= LocalPlayer then
+		task.spawn(function()
+			local success, err = pcall(function()
+				if player then
+					local args = {
+						"Tools",
+						"Remove",
+						player
+					}
+					CoreReplication:FireServer(unpack(args))
+				end
+			end)
+		end)
+	end
+end
+    end
+})
+
+Players:AddButton({
+    Text = "Kill All",
+    Func = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local LocalPlayer = Players.LocalPlayer
+
+for _, player in ipairs(Players:GetPlayers()) do
+	if player ~= LocalPlayer then
+		task.spawn(function()
+			local success, err = pcall(function()
+				if player.Character then
+					local target = player.Character:FindFirstChild("Torso") or player.Character:FindFirstChild("UpperTorso") or player.Character:FindFirstChild("LowerTorso")
+					if target then
+						CoreReplication:FireServer("Tools", "Remove", target)
+					end
+				end
+			end)
+		end)
+	end
+end
+    end
+})
+
+Players:AddButton({
+    Text = "Bring All",
+    Func = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Events = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local ToolsFolder = ReplicatedStorage:WaitForChild("Tools")
+local LocalPlayer = Players.LocalPlayer
+local PaperBallTool = ToolsFolder:WaitForChild("Paper_Ball")
+local LocalPlayerCharacter = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local LocalPlayerRightArm = LocalPlayerCharacter:FindFirstChild("Right Arm") or LocalPlayerCharacter:FindFirstChild("RightHand")
+
+for _, plr in pairs(Players:GetPlayers()) do
+	if plr ~= LocalPlayer and plr.Character and (plr.Character:FindFirstChild("Right Arm") or plr.Character:FindFirstChild("RightHand")) then
+		local humanoid = plr.Character:FindFirstChildWhichIsA("Humanoid")
+		if humanoid and humanoid.Sit == false then
+			Events:FireServer("Tools", "Add", PaperBallTool, LocalPlayerCharacter)
+			Events:FireServer("Tools", "Add", PaperBallTool, plr.Character)
+			task.wait(0.1)
+			local theirPaperBall = plr.Character:FindFirstChild("Paper_Ball") or plr.Character:WaitForChild("Paper_Ball", 1)
+			if theirPaperBall then
+				Events:FireServer("Tools", "Re_Weld", "Add", theirPaperBall, LocalPlayerRightArm)
+			end
+		end
+	end
+end
+
+task.wait(0.5)
+
+for _, plr in ipairs(Players:GetPlayers()) do
+	for _, container in ipairs({plr.Backpack, plr.Character}) do
+		if container then
+			for _, tool in ipairs(container:GetChildren()) do
+				if tool.Name == "Paper_Ball" then
+					Events:FireServer("Tools", "Remove", tool)
+				end
+			end
+		end
+	end
+end
+    end
+})
+
+Players:AddButton({
+    Text = "Morph All",
+    Func = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+
+local localChar = Players.LocalPlayer.Character or Players.LocalPlayer.CharacterAdded:Wait()
+
+for _, plr in ipairs(Players:GetPlayers()) do
+    if plr ~= Players.LocalPlayer then
+        local char = plr.Character or plr.CharacterAdded:Wait()
+        for _, v in ipairs(char:GetChildren()) do
+            if v:IsA("Accessory") or v:IsA("Shirt") or v:IsA("Pants") or v:IsA("ShirtGraphic") then
+                CoreReplication:FireServer("Tools", "Remove", v)
+            end
+        end
+        for _, item in ipairs(localChar:GetChildren()) do
+            if item:IsA("Accessory") or item:IsA("Shirt") or item:IsA("Pants") or item:IsA("ShirtGraphic") then
+                CoreReplication:FireServer("Tools", "Add", item, char)
+            end
+        end
+    end
+end
+    end
+})
+
+Players:AddButton({
+    Text = "Remove Characters",
+    Func = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local LocalPlayer = Players.LocalPlayer
+
+for _, player in ipairs(Players:GetPlayers()) do
+	if player ~= LocalPlayer then
+		task.spawn(function()
+			local success, err = pcall(function()
+				if player.Character then
+					local args = {
+						"Tools",
+						"Remove",
+						player.Character
+					}
+					CoreReplication:FireServer(unpack(args))
+				end
+			end)
+		end)
+	end
+end
+    end
+})
+
+Players:AddButton({
+    Text = "Remove Heads",
+    Func = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local LocalPlayer = Players.LocalPlayer
+
+for _, player in ipairs(Players:GetPlayers()) do
+	if player ~= LocalPlayer then
+		task.spawn(function()
+			local success, err = pcall(function()
+				if player.Character then
+					local args = {
+						"Tools",
+						"Remove",
+						player.Character.Head
+					}
+					CoreReplication:FireServer(unpack(args))
+				end
+			end)
+		end)
+	end
+end
+    end
+})
+
+Players:AddButton({
+    Text = "Remove Arms",
+    Func = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local LocalPlayer = Players.LocalPlayer
+
+local function removeArms(character)
+	if character:FindFirstChild("Right Arm") then
+		local args = {"Tools", "Remove", character["Right Arm"]}
+		CoreReplication:FireServer(unpack(args))
+		args = {"Tools", "Remove", character["Left Arm"]}
+		CoreReplication:FireServer(unpack(args))
+	else
+		local RightArms = {"RightUpperArm", "RightLowerArm", "RightHand"}
+		local LeftArms = {"LeftUpperArm", "LeftLowerArm", "LeftHand"}
+		for _, partName in ipairs(RightArms) do
+			local part = character:FindFirstChild(partName)
+			if part then
+				local args = {"Tools", "Remove", part}
+				CoreReplication:FireServer(unpack(args))
+			end
+		end
+		for _, partName in ipairs(LeftArms) do
+			local part = character:FindFirstChild(partName)
+			if part then
+				local args = {"Tools", "Remove", part}
+				CoreReplication:FireServer(unpack(args))
+			end
+		end
+	end
+end
+
+for _, player in ipairs(Players:GetPlayers()) do
+	if player ~= LocalPlayer and player.Character then
+		task.spawn(function()
+			pcall(function()
+				removeArms(player.Character)
+			end)
+		end)
+	end
+end
+    end
+})
+
+Players:AddButton({
+    Text = "Remove Legs",
+    Func = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local LocalPlayer = Players.LocalPlayer
+
+local function removeLegs(character)
+	if character:FindFirstChild("Right Leg") then
+		local args = {"Tools", "Remove", character["Right Leg"]}
+		CoreReplication:FireServer(unpack(args))
+		args = {"Tools", "Remove", character["Left Leg"]}
+		CoreReplication:FireServer(unpack(args))
+	else
+		local RightLegs = {"RightUpperLeg", "RightLowerLeg", "RightFoot"}
+		local LeftLegs = {"LeftUpperLeg", "LeftLowerLeg", "LeftFoot"}
+		for _, partName in ipairs(RightLegs) do
+			local part = character:FindFirstChild(partName)
+			if part then
+				local args = {"Tools", "Remove", part}
+				CoreReplication:FireServer(unpack(args))
+			end
+		end
+		for _, partName in ipairs(LeftLegs) do
+			local part = character:FindFirstChild(partName)
+			if part then
+				local args = {"Tools", "Remove", part}
+				CoreReplication:FireServer(unpack(args))
+			end
+		end
+	end
+end
+
+for _, player in ipairs(Players:GetPlayers()) do
+	if player ~= LocalPlayer and player.Character then
+		task.spawn(function()
+			pcall(function()
+				removeLegs(player.Character)
+			end)
+		end)
+	end
+end
+    end
+})
+
+local Destruction = Tabs.Destruction:AddLeftGroupbox("Destruction")
+
+Destruction:AddButton({
+    Text = "Remove Map",
+    Func = function()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local Players = game:GetService("Players")
+local checked = {}
+
+while true do
+	for _, obj in ipairs(workspace:GetDescendants()) do
+		if obj:IsA("BasePart") and not checked[obj] then
+			checked[obj] = true
+			local model = obj:FindFirstAncestorOfClass("Model")
+			local owner = Players:GetPlayerFromCharacter(model)
+			if not owner then
+				CoreReplication:FireServer("Tools", "Remove", obj)
+			end
+		end
+	end
+	task.wait()
+end
+    end
+})
+
+Destruction:AddButton({
+    Text = "Remove School",
+    Func = function()
+local args = {
+	"Tools",
+	"Remove",
+	game.Workspace["INSIDE MAP"]
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+    end
+})
+
+Destruction:AddButton({
+    Text = "Decal Spam",
+    Func = function()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local Decal = game.Workspace.Map.Outside.Houses.House_1.Inside.Decor.Poster.Decal
+
+local function fireForAllParts(folder)
+	for _, part in ipairs(folder:GetDescendants()) do
+		if part:IsA("BasePart") then
+			CoreReplication:FireServer("Tools", "Add", Decal, part)
+		end
+	end
+end
+
+local folders = {
+	"Classes",
+	"Teleports",
+	"Seats",
+	"Regions",
+	"Reactors",
+	"Players",
+	"Morphs",
+	"Map",
+	"Lobby",
+	"INSIDE MAP",
+	"Doors"
+}
+
+for _, folderName in ipairs(folders) do
+	local folder = workspace:FindFirstChild(folderName)
+	if folder then
+		pcall(fireForAllParts, folder)
+	end
+	task.wait(1)
+end
+    end
+})
+
+Destruction:AddButton({
+    Text = "Break Game",
+    Func = function()
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+
+for _, item in pairs(ReplicatedStorage:GetChildren()) do
+	if item.Name ~= "Events" then
+		local args = {
+			"Tools",
+			"Remove",
+			item
+		}
+		CoreReplication:FireServer(unpack(args))
+	end
+end
+
+local RPName = "HACKED BY LALAL"
+local Bio = "Welcome to the realm of Lalal"
+local Role = "get rekt niggers"
+
+for _, player in ipairs(Players:GetPlayers()) do
+	if player ~= LocalPlayer then
+		local character = player.Character
+		if character then
+			local head = character:FindFirstChild("Head")
+			if head then
+				local nametag = head:FindFirstChild("Nametag")
+				if nametag then
+					local rpNameObj = nametag:FindFirstChild("Roleplay_Name")
+					local bioObj = nametag:FindFirstChild("Biography")
+					local roleObj = nametag:FindFirstChild("Role")
+
+					if rpNameObj and rpNameObj:IsA("TextLabel") and rpNameObj.Text ~= RPName then
+						CoreReplication:FireServer("Text", "Set", rpNameObj, RPName, "Roleplay_Name")
+					end
+					if bioObj and bioObj:IsA("TextLabel") and bioObj.Text ~= Bio then
+						CoreReplication:FireServer("Text", "Set", bioObj, Bio, "Biography")
+					end
+					if roleObj and roleObj:IsA("TextLabel") and roleObj.Text ~= Role then
+						CoreReplication:FireServer("Text", "Set", roleObj, Role, "Role")
+					end
+				end
+			end
+		end
+	end
+end
+
+local args = {
+	"Tools",
+	"Remove",
+	ReplicatedStorage:WaitForChild("Events")
+}
+CoreReplication:FireServer(unpack(args))
+    end
+})
+
+local Text = Tabs.Destruction:AddRightGroupbox("Text")
+
+Text:AddButton({
+    Text = "Lalal was here Intro Text",
+    Func = function()
+local args = {
+    "Text",
+    "Set",
+    game:GetService("StarterGui").Intro.Main.Loading_Screen.Main.Loading_Text,
+    "Lalal was here",
+    "Roleplay_Name"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+    end
+})
+
+Text:AddButton({
+    Text = "Text Everywhere",
+    Func = function()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local Nametag = LocalPlayer.Character:WaitForChild("Head"):WaitForChild("Nametag")
+
+local function fireForAllParts(folder)
+	for _, part in ipairs(folder:GetDescendants()) do
+		if part:IsA("BasePart") then
+			CoreReplication:FireServer("Tools", "Add", Nametag, part)
+		end
+	end
+end
+
+local folders = {
+	"Classes",
+	"Teleports",
+	"Seats",
+	"Regions",
+	"Reactors",
+	"Players",
+	"Morphs",
+	"Map",
+	"Lobby",
+	"INSIDE MAP",
+	"Doors"
+}
+
+for _, folderName in ipairs(folders) do
+	local folder = workspace:FindFirstChild(folderName)
+	if folder then
+		pcall(fireForAllParts, folder)
+	end
+	task.wait(1)
+end
+    end
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+
+Text:AddToggle("SetText", {
+	Text = "Set Text",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+			task.spawn(function()
+				local Text = "Lalal was here..."
+				
+				for _, obj in ipairs(workspace:GetDescendants()) do
+					if obj:IsA("TextLabel") and obj.Text ~= Text then
+						local args = {
+							"Text",
+							"Set",
+							obj,
+							Text,
+							"Roleplay_Name"
+						}
+						CoreReplication:FireServer(unpack(args))
+						task.wait()
+					end
+				end
+			end)
+		end
+	end
+})
+
+local Account = Tabs.Account:AddLeftGroupbox("Account")
+
+Account:AddInput('RPName', {
+	Default = '',
+	Numeric = false,
+	Finished = true,
+	ClearTextOnFocus = true,
+	Text = 'RP Name',
+	Placeholder = 'Input',
+	Callback = function(Value)
+local args = {
+	"Text",
+	"Set",
+	game:GetService("Players").LocalPlayer.Character:WaitForChild("Head"):WaitForChild("Nametag"):WaitForChild("Roleplay_Name"),
+	Value,
+	"Roleplay_Name"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+	end
+})
+
+Account:AddInput('Bio', {
+	Default = '',
+	Numeric = false,
+	Finished = true,
+	ClearTextOnFocus = true,
+	Text = 'Bio',
+	Placeholder = 'Input',
+	Callback = function(Value)
+local args = {
+	"Text",
+	"Set",
+	game:GetService("Players").LocalPlayer.Character:WaitForChild("Head"):WaitForChild("Nametag"):WaitForChild("Biography"),
+	Value,
+	"Biography"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+	end
+})
+
+Account:AddInput('Role', {
+	Default = '',
+	Numeric = false,
+	Finished = true,
+	ClearTextOnFocus = true,
+	Text = 'Role',
+	Placeholder = 'Input',
+	Callback = function(Value)
+local args = {
+	"Text",
+	"Set",
+	game:GetService("Players").LocalPlayer.Character:WaitForChild("Head"):WaitForChild("Nametag"):WaitForChild("Role"),
+	Value,
+	"Role"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+	end
+})
+
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+
+local RGB_Connection
+
+Account:AddToggle("RGBName", {
+	Text = "RGB Name",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+			local player = Players.LocalPlayer
+			local head = player.Character:WaitForChild("Head")
+			local nametag = head:WaitForChild("Nametag")
+			local roleName = nametag:WaitForChild("Roleplay_Name")
+
+			local hue = 0
+			RGB_Connection = RunService.RenderStepped:Connect(function()
+				hue = (hue + 0.01) % 1
+				local color = Color3.fromHSV(hue, 1, 1)
+
+				local args = {
+					"Text",
+					"Change_Color",
+					roleName,
+					color,
+					"Role_Color"
+				}
+				CoreReplication:FireServer(unpack(args))
+			end)
+		else
+			if RGB_Connection then
+				RGB_Connection:Disconnect()
+				RGB_Connection = nil
+			end
+		end
+	end
+})
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+
+local RGBBioConnection
+
+Account:AddToggle("RGBBio", {
+    Text = "RGB Bio",
+    Default = false,
+    Callback = function(state)
+        if state then
+            local player = Players.LocalPlayer
+            local head = player.Character and player.Character:FindFirstChild("Head")
+            if not head then
+                player.CharacterAdded:Wait()
+                head = player.Character:WaitForChild("Head")
+            end
+            local nametag = head:WaitForChild("Nametag")
+            local biography = nametag:WaitForChild("Biography")
+
+            local hue = 0
+            RGBBioConnection = RunService.RenderStepped:Connect(function()
+                hue = (hue + 0.01) % 1
+                local color = Color3.fromHSV(hue, 1, 1)
+                CoreReplication:FireServer("Text", "Change_Color", biography, color, "Bio_Color")
+            end)
+        else
+            if RGBBioConnection then
+                RGBBioConnection:Disconnect()
+                RGBBioConnection = nil
+            end
+        end
+    end
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+local RunService = game:GetService("RunService")
+
+local Zalgo = {"̍","̎","̄","̅","̿","͒","͗","͑","̇","̈","̃","̂","̌","͐","̀","́","̋","̏"}
+
+local function ZalgoText(text)
+	local out = ""
+	for i = 1, #text do
+		local ch = text:sub(i,i)
+		local glitch = ch
+		for _ = 1, math.random(25,40) do
+			glitch ..= Zalgo[math.random(1,#Zalgo)]
+		end
+		out ..= glitch
+	end
+	return out
+end
+
+local ZalgoConnection
+
+local function StartZalgo()
+	if ZalgoConnection then ZalgoConnection:Disconnect() end
+
+	local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+	local head = character:WaitForChild("Head")
+	local nametag = head:WaitForChild("Nametag")
+	local RoleplayName = nametag:WaitForChild("Roleplay_Name")
+	local OriginalText = RoleplayName.Text
+
+	ZalgoConnection = RunService.Heartbeat:Connect(function()
+		if RoleplayName and RoleplayName.Parent then
+			CoreReplication:FireServer("Text","Set",RoleplayName,ZalgoText(OriginalText),"Roleplay_Name")
+		end
+	end)
+end
+
+Account:AddToggle("ZalgoText", {
+	Text = "Zalgo Text",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+			StartZalgo()
+		else
+			if ZalgoConnection then ZalgoConnection:Disconnect() ZalgoConnection = nil end
+		end
+	end
+})
+
+Account:AddButton({
+    Text = "Highlight (White)",
+    Func = function()
+local args = {
+	"Tools",
+	"Add",
+	game:GetService("ReplicatedStorage").Misc.Prompt_Highlighter,
+	game:GetService("Players").LocalPlayer.Character
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+    end
+})
+
+Account:AddButton({
+    Text = "Highlight (Green)",
+    Func = function()
+local args = {
+	"Tools",
+	"Add",
+	game:GetService("ReplicatedStorage").Misc.Class_Highlighter,
+	game:GetService("Players").LocalPlayer.Character
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+    end
+})
+
+Account:AddButton({
+    Text = "Remove Highlight",
+    Func = function()
+local args = {
+	"Tools",
+	"Remove",
+	game:GetService("Players").LocalPlayer.Character.Prompt_Highlighter
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+task.wait()
+local args = {
+	"Tools",
+	"Remove",
+	game:GetService("Players").LocalPlayer.Character.Class_Highlighter
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+    end
+})
+
+local Account = Tabs.Account:AddRightGroupbox("Account")
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreReplication = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication")
+
+local Whitelist = {"ohioboipepsiV2", "duperfreakyfella", "bananasplitsed", "MaycowGamer", "Brok8790", "BMT775", "zz35p"}
+
+local RGBNameToggle = false
+local RGBNameConnection
+
+Account:AddToggle("RGBNameTeam", {
+    Text = "RGB Name (Team)",
+    Default = false,
+    Callback = function(state)
+        RGBNameToggle = state
+        if RGBNameToggle then
+            local hue = 0
+            RGBNameConnection = RunService.RenderStepped:Connect(function()
+                hue = (hue + 0.01) % 1
+                local color = Color3.fromHSV(hue, 1, 1)
+                for _, name in ipairs(Whitelist) do
+                    local player = Players:FindFirstChild(name)
+                    if player and player.Character and player.Character:FindFirstChild("Head") then
+                        local nametag = player.Character.Head:FindFirstChild("Nametag")
+                        if nametag then
+                            local roleName = nametag:FindFirstChild("Roleplay_Name")
+                            if roleName then
+                                CoreReplication:FireServer("Text", "Change_Color", roleName, color, "Role_Color")
+                            end
+                        end
+                    end
+                end
+            end)
+        else
+            if RGBNameConnection then
+                RGBNameConnection:Disconnect()
+                RGBNameConnection = nil
+            end
+        end
+    end
+})
+
+local RGBBioToggle = false
+local RGBBioConnection
+
+Account:AddToggle("RGBBioTeam", {
+    Text = "RGB Bio (Team)",
+    Default = false,
+    Callback = function(state)
+        RGBBioToggle = state
+        if RGBBioToggle then
+            local hue = 0
+            RGBBioConnection = RunService.RenderStepped:Connect(function()
+                hue = (hue + 0.01) % 1
+                local color = Color3.fromHSV(hue, 1, 1)
+                for _, name in ipairs(Whitelist) do
+                    local player = Players:FindFirstChild(name)
+                    if player and player.Character and player.Character:FindFirstChild("Head") then
+                        local nametag = player.Character.Head:FindFirstChild("Nametag")
+                        if nametag then
+                            local biography = nametag:FindFirstChild("Biography")
+                            if biography then
+                                CoreReplication:FireServer("Text", "Change_Color", biography, color, "Bio_Color")
+                            end
+                        end
+                    end
+                end
+            end)
+        else
+            if RGBBioConnection then
+                RGBBioConnection:Disconnect()
+                RGBBioConnection = nil
+            end
+        end
+    end
+})
+
+Account:AddButton({
+    Text = "Highlight (White)",
+    Func = function()
+        for _, name in ipairs(Whitelist) do
+            local player = Players:FindFirstChild(name)
+            if player and player.Character then
+                CoreReplication:FireServer("Tools", "Add", ReplicatedStorage.Misc.Prompt_Highlighter, player.Character)
+            end
+        end
+    end
+})
+
+Account:AddButton({
+    Text = "Highlight (Green)",
+    Func = function()
+        for _, name in ipairs(Whitelist) do
+            local player = Players:FindFirstChild(name)
+            if player and player.Character then
+                CoreReplication:FireServer("Tools", "Add", ReplicatedStorage.Misc.Class_Highlighter, player.Character)
+            end
+        end
+    end
+})
+
+Account:AddButton({
+    Text = "Remove Highlight",
+    Func = function()
+        for _, name in ipairs(Whitelist) do
+            local player = Players:FindFirstChild(name)
+            if player and player.Character then
+                local ph = player.Character:FindFirstChild("Prompt_Highlighter")
+                if ph then
+                    CoreReplication:FireServer("Tools", "Remove", ph)
+                end
+                local ch = player.Character:FindFirstChild("Class_Highlighter")
+                if ch then
+                    CoreReplication:FireServer("Tools", "Remove", ch)
+                end
+            end
+        end
+    end
+})
+
+local Tools = Tabs.Tools:AddLeftGroupbox("Tools")
+
+Tools:AddToggle("KnifeKill", {
+    Text = "Knife Kill",
+    Default = false,
+    Callback = function(Value)
+        local Players = game:GetService("Players")
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local LocalPlayer = Players.LocalPlayer
+        local Events = ReplicatedStorage:WaitForChild("Events")
+        local CoreReplication = Events:WaitForChild("Core_Replication")
+        if not getgenv().KnifeKillConnections then getgenv().KnifeKillConnections = {} end
+
+        local function getNearestPlayer(maxDist)
+            local character = LocalPlayer.Character
+            if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+            local hrp = character.HumanoidRootPart
+            local nearest, dist = nil, maxDist or math.huge
+            for _, plr in pairs(Players:GetPlayers()) do
+                if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                    local d = (hrp.Position - plr.Character.HumanoidRootPart.Position).Magnitude
+                    if d < dist then
+                        dist = d
+                        nearest = plr
+                    end
+                end
+            end
+            return nearest
+        end
+
+        local function connectKnife(tool)
+            if tool.Name ~= "Knife" then return end
+            local c
+            c = tool.Activated:Connect(function()
+                local target = getNearestPlayer(5)
+                if target and target.Character and target.Character:FindFirstChild("Humanoid") then
+                    local args1 = {"Death",target.Character,target.Character:WaitForChild("Character_Settings")}
+                    CoreReplication:FireServer(unpack(args1))
+                    local args2 = {"Change_Book_Color",target.Character.Character_Settings,"Ragdoll",true,game:GetService("Players").LocalPlayer,{Color3.fromRGB(0, 0, 0),Color3.fromRGB(0, 0, 0)}}
+                    CoreReplication:FireServer(unpack(args2))
+                end
+            end)
+            table.insert(getgenv().KnifeKillConnections,c)
+        end
+
+        if Value then
+            local c1 = LocalPlayer.Backpack.ChildAdded:Connect(connectKnife)
+            table.insert(getgenv().KnifeKillConnections,c1)
+            if LocalPlayer.Character then
+                for _, t in pairs(LocalPlayer.Character:GetChildren()) do
+                    if t:IsA("Tool") then connectKnife(t) end
+                end
+            end
+        else
+            for _,c in pairs(getgenv().KnifeKillConnections) do
+                if c.Disconnect then c:Disconnect() end
+            end
+            getgenv().KnifeKillConnections = {}
+        end
+    end
+})
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+local InfiniteRulerConnection
+
+Tools:AddToggle("InfiniteRuler", {
+    Text = "Infinite Ruler",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            InfiniteRulerConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                local char = LocalPlayer.Character
+                local ruler = char and char:FindFirstChild("Ruler")
+                if ruler then
+                    local args = {
+                        "Ruler",
+                        ruler,
+                        ReplicatedStorage:WaitForChild("Sounds"):WaitForChild("Tools"):WaitForChild("Ruler")
+                    }
+                    ReplicatedStorage:WaitForChild("Events"):WaitForChild("Tools"):FireServer(unpack(args))
+                end
+            end)
+        else
+            if InfiniteRulerConnection then
+                InfiniteRulerConnection:Disconnect()
+                InfiniteRulerConnection = nil
+            end
+        end
+    end
+})
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+local InfiniteItemsThrow
+
+Tools:AddToggle("InfiniteItemsThrow", {
+    Text = "Infinite Items Throw",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            InfiniteItemsThrow = game:GetService("RunService").RenderStepped:Connect(function()
+                local Character = LocalPlayer.Character
+                if Character then
+                    local Tool = Character:FindFirstChildOfClass("Tool")
+                    if Tool then
+                        local args = {
+                            "Throw_Prop",
+                            Tool,
+                            160,
+                            0.50,
+                            4.5
+                        }
+                        ReplicatedStorage:WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+                    end
+                end
+            end)
+        else
+            if InfiniteItemsThrow then
+                InfiniteItemsThrow:Disconnect()
+                InfiniteItemsThrow = nil
+            end
+        end
+    end
+})
+
+local Admin = Tabs.Admin:AddLeftGroupbox("Admin")
+
+Admin:AddInput('Announce', {
+	Default = '',
+	Numeric = false,
+	Finished = true,
+	ClearTextOnFocus = true,
+	Text = 'Announce',
+	Placeholder = 'Input',
+	Callback = function(Value)
+local args = {
+	"Change_Book_Color",
+	game:GetService("ReplicatedStorage").Game_Info,
+	"Current_Class",
+	Value,
+	game:GetService("Players").LocalPlayer,
+	{
+		Color3.fromRGB(0, 0, 0),
+		Color3.fromRGB(0, 0, 0)
+	}
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+	end
+})
+
+Admin:AddInput('SpeedAll', {
+	Default = '',
+	Numeric = true,
+	Finished = true,
+	ClearTextOnFocus = true,
+	Text = 'Speed All',
+	Placeholder = 'Input',
+	Callback = function(Value)
+local event = game.ReplicatedStorage.Events.Core_Replication
+
+for _, plr in pairs(game.Players:GetPlayers()) do
+    local args = {
+        "Change_Book_Color",
+        plr.Character.Character_Settings.Animator,
+        "Walk_Speed",
+        Value,
+        game.Players.LocalPlayer,
+        {
+            Color3.fromRGB(0, 0, 0),
+            Color3.fromRGB(0, 0, 0)
+        }
+    }
+    event:FireServer(unpack(args))
+end
+	end
+})
+
+local Lighting = Tabs.Admin:AddRightGroupbox("Lighting")
+
+Lighting:AddButton({
+    Text = "Day",
+    Func = function()
+local args = {
+	"Change_Book_Color",
+	game:GetService("ReplicatedStorage").Game_Info.Lighting,
+	"Daytime",
+	"Day",
+	game:GetService("Players").LocalPlayer,
+	{
+		Color3.fromRGB(0, 0, 0),
+		Color3.fromRGB(0, 0, 0)
+	}
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+    end
+})
+
+Lighting:AddButton({
+    Text = "Night",
+    Func = function()
+local args = {
+	"Change_Book_Color",
+	game:GetService("ReplicatedStorage").Game_Info.Lighting,
+	"Daytime",
+	"Night",
+	game:GetService("Players").LocalPlayer,
+	{
+		Color3.fromRGB(0, 0, 0),
+		Color3.fromRGB(0, 0, 0)
+	}
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Core_Replication"):FireServer(unpack(args))
+    end
+})
+
+local Miscellaneous = Tabs.Admin:AddRightGroupbox("Miscellaneous")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Events = ReplicatedStorage:WaitForChild("Events")
+local CoreReplication = Events:WaitForChild("Core_Replication")
+local RunService = game:GetService("RunService")
+
+local Text = "Lalal"
+
+local zalgo_up = { "̍","̎","̄","̅","̿","̑","̆","̐","͒","͗","͑","̇","̈","̊","͂","̓","̈","͊","͋","͌","̃","̂","̌","͐" }
+local zalgo_down = { "̖","̗","̘","̙","̜","̝","̞","̟","̠","̤","̥","̦","̩","̪","̫","̬","̭","̮","̯","̰","̱","̲","̳","̹","̺","̻","̼","ͅ","͇","͈","͉","͍","͎","͓","͔","͕","͖","͙","͚","̣" }
+
+local function Zalgo(text, intensity)
+    local out = ""
+    for i = 1, #text do
+        local c = text:sub(i,i)
+        out = out .. c
+        for _ = 1, intensity do
+            out = out .. zalgo_up[math.random(1, #zalgo_up)]
+        end
+        for _ = 1, intensity do
+            out = out .. zalgo_down[math.random(1, #zalgo_down)]
+        end
+    end
+    return out
+end
+
+local ZalgoClassNotificationSpam
+
+Miscellaneous:AddToggle("ZalgoClassNotificationSpam", {
+    Text = "Zalgo Class Notification Spam",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            ZalgoClassNotificationSpam = RunService.Heartbeat:Connect(function()
+                local glitched = Zalgo(Text, 70)
+                CoreReplication:FireServer("Change_Book_Color", ReplicatedStorage.Game_Info, "Current_Class", glitched)
+            end)
+        else
+            if ZalgoClassNotificationSpam then
+                ZalgoClassNotificationSpam:Disconnect()
+                ZalgoClassNotificationSpam = nil
+            end
+        end
+    end
+})
+
+Miscellaneous:AddInput("ZalgoBaseName", {
+    Default = "",
+    Numeric = false,
+    Finished = true,
+    ClearTextOnFocus = true,
+    Text = "Zalgo Text",
+    Placeholder = "Input",
+    Callback = function(Value)
+        Text = Value
+    end
+})
+
+local CoreReplication = game.ReplicatedStorage.Events.Core_Replication
+
+local NormalSpeed = {
+    Walk_Speed = 16,
+    Run_Speed = 26,
+    Reverse_Walk_Speed = 11,
+    Crouch_Speed = 12,
+    Crawl_Speed = 10
+}
+
+local Frozen = {}
+local LoopRunning = false
+local FreezeAllOn = false
+
+local function FreezeCharacter(plr)
+    if plr ~= game.Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("Character_Settings") then
+        for SpeedType in pairs(NormalSpeed) do
+            CoreReplication:FireServer(
+                "Change_Book_Color",
+                plr.Character.Character_Settings.Animator,
+                SpeedType,
+                0,
+                game.Players.LocalPlayer,
+                {Color3.new(0,0,0), Color3.new(0,0,0)}
+            )
+        end
+        Frozen[plr] = true
+    end
+end
+
+local function UnfreezeCharacter(plr)
+    if plr ~= game.Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("Character_Settings") then
+        for SpeedType, SpeedValue in pairs(NormalSpeed) do
+            CoreReplication:FireServer(
+                "Change_Book_Color",
+                plr.Character.Character_Settings.Animator,
+                SpeedType,
+                SpeedValue,
+                game.Players.LocalPlayer,
+                {Color3.new(0,0,0), Color3.new(0,0,0)}
+            )
+        end
+    end
+end
+
+local function HookPlayer(plr)
+    plr.CharacterAdded:Connect(function()
+        task.wait()
+        if FreezeAllOn then
+            FreezeCharacter(plr)
+        end
+    end)
+end
+
+for _, plr in pairs(game.Players:GetPlayers()) do
+    HookPlayer(plr)
+end
+
+game.Players.PlayerAdded:Connect(function(plr)
+    HookPlayer(plr)
+end)
+
+Miscellaneous:AddToggle("FreezeAll", {
+    Text = "Freeze All",
+    Default = false,
+    Callback = function(Value)
+        FreezeAllOn = Value
+        if Value then
+            if not LoopRunning then
+                LoopRunning = true
+                task.spawn(function()
+                    while LoopRunning and FreezeAllOn do
+                        for _, Plr in pairs(game.Players:GetPlayers()) do
+                            if not Frozen[Plr] then
+                                FreezeCharacter(Plr)
+                            end
+                        end
+                        task.wait()
+                    end
+                end)
+            end
+        else
+            LoopRunning = false
+            for _, Plr in pairs(game.Players:GetPlayers()) do
+                UnfreezeCharacter(Plr)
+            end
+            Frozen = {}
+        end
+    end
+})
+
+Library:OnUnload(function()
+	print("Unloaded!")
+	Library.Unloaded = true
+end)
+
+local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
+
+MenuGroup:AddToggle("KeybindMenuOpen", {
+	Default = Library.KeybindFrame.Visible,
+	Text = "Open Keybind Menu",
+	Callback = function(value)
+		Library.KeybindFrame.Visible = value
+	end,
+})
+MenuGroup:AddToggle("ShowCustomCursor", {
+	Text = "Custom Cursor",
+	Default = true,
+	Callback = function(Value)
+		Library.ShowCustomCursor = Value
+	end,
+})
+MenuGroup:AddDropdown('Notification Side', {
+	Values = {'Left', 'Right'},
+	Default = 1,
+	Multi = false,
+	Text = 'Notification Side',
+	Callback = function(Value)
+		Library.NotifySide = Value
+	end
+})
+MenuGroup:AddDivider()
+MenuGroup:AddLabel("Menu bind")
+	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+MenuGroup:AddButton("Unload", function()
+	Library:Unload()
+end)
+
+Library.ToggleKeybind = Options.MenuKeybind
+
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("ProjectHax")
+SaveManager:SetFolder("ProjectHax/FundamentalPaperEducation")
+SaveManager:SetSubFolder("FundamentalPaperEducation")
+SaveManager:BuildConfigSection(Tabs["UI Settings"])
+ThemeManager:ApplyToTab(Tabs["UI Settings"])
+SaveManager:LoadAutoloadConfig()
